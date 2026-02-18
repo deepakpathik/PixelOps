@@ -8,6 +8,8 @@ Unlike traditional arcade websites that only host games, PixelOps is architected
 
 The platform emphasizes clean architecture, object-oriented design principles, system design best practices, and appropriate design pattern usage. Backend engineering is the primary focus of the system.
 
+The backend is implemented using **FastAPI**, leveraging Python’s strong support for OOP, async programming, and scalable API design.
+
 ---
 
 ## Problem Statement
@@ -69,8 +71,8 @@ Design Patterns Used:
 - Global and game-specific leaderboards
 - Top-N optimized ranking logic
 - Seasonal ranking reset
-- Cached ranking computation
-- Concurrency-safe score submission
+- Cached ranking computation using Redis
+- Concurrency-safe score submission using async handling
 
 Algorithms Used:
 - Heap for Top-K ranking
@@ -118,9 +120,9 @@ Design Pattern Used:
 - Audit trail for transparency
 
 Concepts Used:
-- ACID transactions
+- ACID transactions (PostgreSQL)
 - Repository Pattern
-- Transaction management
+- Transaction management with SQLAlchemy
 
 ---
 
@@ -145,8 +147,8 @@ Design Pattern Used:
 
 Architecture Approach:
 - Event-driven design
-- WebSocket-based updates
-- Optional Redis pub/sub integration
+- WebSocket integration with FastAPI
+- Optional Redis pub/sub for scalability
 
 ---
 
@@ -157,7 +159,10 @@ Frontend:
 - Chart.js
 
 Backend:
-- Node.js (NestJS or Express) with TypeScript
+- FastAPI (Python)
+- Pydantic (Data validation)
+- SQLAlchemy (ORM)
+- Async support with asyncio
 
 Database:
 - PostgreSQL
@@ -166,13 +171,13 @@ Caching:
 - Redis
 
 Real-time Communication:
-- WebSocket (Socket.io)
+- WebSocket (FastAPI native support)
 
 Authentication:
 - JWT with Role-Based Access Control
 
 Testing:
-- Jest
+- Pytest
 
 DevOps:
 - Docker
@@ -182,12 +187,13 @@ DevOps:
 
 ## Architecture Principles
 
-- Clean Architecture (Controller → Service → Repository)
+- Clean Architecture (API → Service → Repository)
 - Separation of concerns
 - SOLID principles
-- DTO pattern for API contracts
+- DTO pattern using Pydantic models
 - Repository pattern for data abstraction
 - Modular domain-driven structure
+- Async-first API design for scalability
 
 ---
 
@@ -197,7 +203,7 @@ DevOps:
 - Factory Pattern (Game creation)
 - Observer Pattern (Event notifications)
 - State Pattern (Tournament lifecycle)
-- Singleton Pattern (Logger / configuration)
+- Singleton Pattern (Logger / configuration manager)
 - Repository Pattern (Database access abstraction)
 - Builder Pattern (Tournament creation)
 - Chain of Responsibility Pattern (Fraud validation pipeline)
@@ -230,10 +236,10 @@ Admin:
 
 ## Advanced System Design Considerations
 
-- Concurrency handling for simultaneous score submissions
-- Optimized leaderboard recalculation
-- Caching layer for high-frequency reads
+- Async handling of concurrent score submissions
+- Optimized leaderboard recalculation with caching
 - Transaction consistency for wallet operations
-- Event-driven architecture for system scalability
+- Event-driven architecture for scalability
 - Structured tournament bracket generation
 - Secure validation of uploaded game files
+- Modular service separation for future microservice migration
