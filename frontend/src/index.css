@@ -1,4 +1,4 @@
-@import 'tailwindcss' source(none);
+@import 'tailwindcss';
 @source '../**/*.{js,ts,jsx,tsx}';
 
 @import 'tw-animate-css';
@@ -181,5 +181,15 @@
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
+  }
+}
+
+@layer components {
+  .pixelops-card {
+    @apply bg-zinc-950 border border-[#1a1a1a] rounded-md transition-all duration-200 hover:border-[#107C10] hover:scale-[1.01] hover:shadow-[0_0_15px_rgba(16,124,16,0.1)];
+  }
+
+  .pixelops-btn {
+    @apply transition-all duration-200 active:scale-95 hover:brightness-110;
   }
 }

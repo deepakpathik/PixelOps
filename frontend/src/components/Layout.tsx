@@ -34,10 +34,10 @@ export function Layout() {
               to={item.path}
               end={item.path === "/"}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 mb-1 rounded transition-colors ${
+                `flex items-center gap-3 px-4 py-3 mb-1 rounded-md transition-all duration-200 ${
                   isActive
-                    ? "bg-[#107C10] text-white"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+                    ? "bg-[#107C10] text-white font-semibold shadow-md"
+                    : "text-zinc-400 hover:text-white hover:bg-zinc-900/80 hover:translate-x-1"
                 }`
               }
             >
@@ -48,8 +48,8 @@ export function Layout() {
         </nav>
 
         <div 
-          className={`p-4 border-t border-zinc-800 transition-colors ${
-            isGuest ? "cursor-pointer hover:bg-zinc-900" : ""
+          className={`p-4 border-t border-zinc-800 transition-all duration-200 ${
+            isGuest ? "cursor-pointer hover:bg-zinc-900 hover:border-zinc-700" : ""
           }`}
           onClick={() => isGuest && setIsAuthModalOpen(true)}
         >
@@ -68,7 +68,7 @@ export function Layout() {
             {!isGuest && (
               <button 
                 onClick={(e) => { e.stopPropagation(); logout(); }}
-                className="p-1.5 text-zinc-500 hover:text-white rounded transition-colors hover:bg-zinc-800"
+                className="p-1.5 text-zinc-500 hover:text-white rounded-md transition-all duration-200 hover:bg-zinc-800 pixelops-btn"
                 title="Logout"
               >
                 <LogOut size={16} />
@@ -86,20 +86,20 @@ export function Layout() {
               <input
                 type="text"
                 placeholder="Search games, tournaments, players..."
-                className="w-full bg-zinc-900 border border-zinc-800 rounded pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#107C10] transition-colors"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-md pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-[#107C10] transition-colors"
               />
             </div>
           </div>
           
           <div className="flex items-center gap-4">
 
-          <button className="w-10 h-10 rounded flex items-center justify-center hover:bg-zinc-900 transition-colors relative">
+          <button className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-zinc-900 transition-all duration-200 relative pixelops-btn">
             <Bell size={20} className="text-zinc-400" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-[#107C10] rounded-full"></span>
           </button>
 
           <button 
-            className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:ring-2 ring-[#107C10] transition-all"
+            className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:ring-2 ring-[#107C10] transition-all duration-200 pixelops-btn"
             onClick={() => isGuest && setIsAuthModalOpen(true)}
           >
             <User size={18} className={isGuest ? "text-zinc-400" : "text-[#107C10]"} />
