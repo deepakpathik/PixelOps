@@ -79,8 +79,8 @@ export function Layout() {
       </aside>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-zinc-950 border-b border-zinc-800 flex items-center px-6 gap-4">
-          <div className="flex-1 max-w-xl">
+        <header className="h-16 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between px-6 gap-4">
+          <div className="flex-1 mr-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
               <input
@@ -90,6 +90,8 @@ export function Layout() {
               />
             </div>
           </div>
+          
+          <div className="flex items-center gap-4">
 
           <button className="w-10 h-10 rounded flex items-center justify-center hover:bg-zinc-900 transition-colors relative">
             <Bell size={20} className="text-zinc-400" />
@@ -102,6 +104,7 @@ export function Layout() {
           >
             <User size={18} className={isGuest ? "text-zinc-400" : "text-[#107C10]"} />
           </button>
+          </div>
         </header>
 
         <main className="flex-1 overflow-auto bg-black">
