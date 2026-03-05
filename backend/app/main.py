@@ -1,12 +1,21 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.db.prisma import db
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await db.connect()
+    yield
+    await db.disconnect()
 
 app = FastAPI(
     title="PixelOps API",
     description="Backend for the PixelOps arcade gaming platform",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
