@@ -21,3 +21,31 @@ enum Role {
   PLAYER
   ADMIN
 }
+
+model Game {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  format      GameFormat
+  isActive    Boolean  @default(true)
+  developerId String
+  createdAt   DateTime @default(now())
+
+  versions    GameVersion[]
+}
+
+model GameVersion {
+  id        String   @id @default(uuid())
+  gameId    String
+  version   String
+  fileUrl   String
+  createdAt DateTime @default(now())
+
+  game      Game @relation(fields: [gameId], references: [id])
+}
+
+enum GameFormat {
+  HTML5
+  WEBGL
+  IFRAME
+}
