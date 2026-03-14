@@ -26,3 +26,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise credentials_exception
         
     return user
+
+async def require_developer_role(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Requires developer access"
+        )
+    return current_user
