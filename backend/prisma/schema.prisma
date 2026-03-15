@@ -15,6 +15,8 @@ model User {
   role      Role     @default(PLAYER)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+  
+  scores    Score[]
 }
 
 enum Role {
@@ -32,6 +34,7 @@ model Game {
   createdAt   DateTime @default(now())
 
   versions    GameVersion[]
+  scores      Score[]
 }
 
 model GameVersion {
@@ -48,4 +51,15 @@ enum GameFormat {
   HTML5
   WEBGL
   IFRAME
+}
+
+model Score {
+  id        String   @id @default(uuid())
+  userId    String
+  gameId    String
+  value     Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
 }
