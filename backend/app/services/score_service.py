@@ -1,0 +1,38 @@
+from fastapi import HTTPException, status
+from app.repositories import score_repository, game_repository, user_repository
+from prisma.types import ScoreCreateInput
+from prisma.models import Score
+from typing import List
+
+async def submit_score(user_id: str, game_id: str, value: int) -> Score:
+    user = await user_repository.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+        
+    game = await game_repository.get_game_by_id(game_id)
+    if not game:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Game not found"
+        )
+        
+    data: ScoreCreateInput = {
+        "userId": user_id,
+        "gameId": game_id,
+        "value": value
+    }
+    
+    return await score_repository.create_score(data)
+
+async def get_game_scores(game_id: str, limit: int = 50) -> List[Score]:
+    game = await game_repository.get_game_by_id(game_id)
+    if not game:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Game not found"
+        )
+        
+    return await score_repository.get_scores_by_game(game_id, limit)
