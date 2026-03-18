@@ -6,6 +6,7 @@ from app.api.health import router as health_router
 from app.api.auth import router as auth_router
 from app.api.games import router as games_router
 from app.api.scores import router as scores_router
+from app.api.leaderboard import router as leaderboard_router
 from app.db.prisma import db
 
 @asynccontextmanager
@@ -33,3 +34,4 @@ app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(games_router)
 app.include_router(scores_router)
+app.include_router(leaderboard_router)
