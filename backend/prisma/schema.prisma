@@ -17,6 +17,7 @@ model User {
   createdAt DateTime @default(now())
   
   scores    Score[]
+  wallet    Wallet?
 }
 
 enum Role {
@@ -62,4 +63,23 @@ model Score {
 
   user User @relation(fields: [userId], references: [id])
   game Game @relation(fields: [gameId], references: [id])
+}
+
+model Wallet {
+  id      String @id @default(uuid())
+  userId  String @unique
+  balance Float  @default(0)
+
+  user User @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  walletId  String
+  type      String
+  amount    Float
+  createdAt DateTime @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
 }
