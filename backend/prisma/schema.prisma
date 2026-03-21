@@ -18,6 +18,7 @@ model User {
   
   scores    Score[]
   wallet    Wallet?
+  tournamentParticipants TournamentParticipant[]
 }
 
 enum Role {
@@ -36,6 +37,7 @@ model Game {
 
   versions    GameVersion[]
   scores      Score[]
+  tournaments Tournament[]
 }
 
 model GameVersion {
@@ -82,4 +84,36 @@ model Transaction {
   createdAt DateTime @default(now())
 
   wallet Wallet @relation(fields: [walletId], references: [id])
+}
+
+model Tournament {
+  id        String   @id @default(uuid())
+  name      String
+  gameId    String
+  status    TournamentStatus @default(CREATED)
+  entryFee  Float
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id])
+  participants TournamentParticipant[]
+  // matches Match[]
+}
+
+model TournamentParticipant {
+  id           String @id @default(uuid())
+  tournamentId String
+  userId       String
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum TournamentStatus {
+  CREATED
+  OPEN
+  ONGOING
+  COMPLETED
+  ARCHIVED
 }
