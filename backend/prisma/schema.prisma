@@ -98,7 +98,7 @@ model Tournament {
 
   game Game @relation(fields: [gameId], references: [id])
   participants TournamentParticipant[]
-  // matches Match[]
+  matches Match[]
 }
 
 model TournamentParticipant {
@@ -116,4 +116,15 @@ enum TournamentStatus {
   ONGOING
   COMPLETED
   ARCHIVED
+}
+
+model Match {
+  id            String @id @default(uuid())
+  tournamentId  String
+  round         Int
+  player1Id     String
+  player2Id     String
+  winnerId      String?
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
 }
