@@ -12,6 +12,12 @@ async def get_tournament(tournament_id: str) -> Optional[Tournament]:
         include={"participants": True, "matches": True, "game": True}
     )
 
+async def update_status(tournament_id: str, status: str) -> Tournament:
+    return await db.tournament.update(
+        where={"id": tournament_id},
+        data={"status": status}
+    )
+
 async def add_participant(data: TournamentParticipantCreateInput) -> TournamentParticipant:
     return await db.tournamentparticipant.create(data=data)
 
