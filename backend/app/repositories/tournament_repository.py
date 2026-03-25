@@ -18,6 +18,11 @@ async def update_status(tournament_id: str, status: str) -> Tournament:
         data={"status": status}
     )
 
+async def get_all_tournaments() -> List[Tournament]:
+    return await db.tournament.find_many(
+        order={"createdAt": "desc"}
+    )
+
 async def add_participant(data: TournamentParticipantCreateInput) -> TournamentParticipant:
     return await db.tournamentparticipant.create(data=data)
 
