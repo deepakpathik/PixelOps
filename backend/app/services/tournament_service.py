@@ -51,10 +51,33 @@ async def start_tournament(tournament_id: str) -> List[Match]:
     if not tournament:
         raise HTTPException(status_code=404, detail="Tournament not found")
         
+    if tournament.status != "OPEN":
+        raise HTTPException(status_code=400, detail="Tournament must be OPEN to start")
+        
     matches = await generate_bracket(tournament_id)
     await tournament_repository.update_status(tournament_id, "ONGOING")
     
     return matches
+
+async def open_tournament(tournament_id: str) -> Tournament:
+    tournament = await tournament_repository.get_tournament(tournament_id)
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+        
+    if tournament.status != "CREATED":
+        raise HTTPException(status_code=400, detail="Tournament must be CREATED to map to OPEN")
+        
+    return await tournament_repository.update_status(tournament_id, "OPEN")
+
+async def complete_tournament(tournament_id: str) -> Tournament:
+    tournament = await tournament_repository.get_tournament(tournament_id)
+    if not tournament:
+        raise HTTPException(status_code=404, detail="Tournament not found")
+        
+    if tournament.status != "ONGOING":
+        raise HTTPException(status_code=400, detail="Tournament must be ONGOING to successfully complete")
+        
+    return await tournament_repository.update_status(tournament_id, "COMPLETED")
 
 async def get_bracket(tournament_id: str) -> List[Match]:
     return await tournament_repository.get_matches(tournament_id)
