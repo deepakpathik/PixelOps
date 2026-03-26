@@ -65,6 +65,7 @@ model Score {
 
   user User @relation(fields: [userId], references: [id])
   game Game @relation(fields: [gameId], references: [id])
+  fraudFlags FraudFlag[]
 }
 
 model Wallet {
@@ -127,4 +128,13 @@ model Match {
   winnerId      String?
 
   tournament Tournament @relation(fields: [tournamentId], references: [id])
+}
+
+model FraudFlag {
+  id        String @id @default(uuid())
+  scoreId   String
+  reason    String
+  status    String @default("PENDING")
+
+  score Score @relation(fields: [scoreId], references: [id])
 }
