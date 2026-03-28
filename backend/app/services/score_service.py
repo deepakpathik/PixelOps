@@ -25,6 +25,26 @@ async def submit_score(user_id: str, game_id: str, value: int) -> Score:
         "value": value
     }
     
+    from app.services.fraud_service import fraud_pipeline
+    from app.db.prisma import db
+    
+    # Securely evaluate explicit pipelines blocking anomalous bounds securely
+    is_valid = await fraud_pipeline.evaluate(data)
+    
+    if not is_valid:
+        # We must insert the score to satisfy the strict relational DB bounds tracking inherently 
+        flagged_score = await score_repository.create_score(data)
+        await db.fraudflag.create({
+            "data": {
+                "scoreId": flagged_score.id,
+                "reason": "Failed automated fraud validation pipeline bounds"
+            }
+        })
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Score rejected by automated fraud prevention systems"
+        )
+    
     return await score_repository.create_score(data)
 
 async def get_game_scores(game_id: str, limit: int = 50) -> List[Score]:
