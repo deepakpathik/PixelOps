@@ -9,6 +9,7 @@ from app.api.scores import router as scores_router
 from app.api.leaderboard import router as leaderboard_router
 from app.api.wallet import router as wallet_router
 from app.api.tournaments import router as tournament_router
+from app.api.admin import router as admin_router
 from app.db.prisma import db
 
 @asynccontextmanager
@@ -39,3 +40,4 @@ app.include_router(scores_router)
 app.include_router(leaderboard_router)
 app.include_router(wallet_router)
 app.include_router(tournament_router)
+app.include_router(admin_router)

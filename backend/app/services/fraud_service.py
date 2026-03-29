@@ -48,3 +48,22 @@ class FraudValidationPipeline:
         return await self.chain_head.validate(score_data)
 
 fraud_pipeline = FraudValidationPipeline()
+
+async def get_pending_flags() -> Any:
+    from app.db.prisma import db
+    return await db.fraudflag.find_many(
+        where={"status": "PENDING"},
+        include={"score": True}
+    )
+
+async def resolve_flag(flag_id: str, action: str) -> Any:
+    from app.db.prisma import db
+    from fastapi import HTTPException
+    flag = await db.fraudflag.find_unique(where={"id": flag_id})
+    if not flag:
+        raise HTTPException(status_code=404, detail="Fraud flag not found")
+        
+    return await db.fraudflag.update(
+        where={"id": flag_id},
+        data={"status": action}
+    )
