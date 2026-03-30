@@ -138,3 +138,11 @@ model FraudFlag {
 
   score Score @relation(fields: [scoreId], references: [id])
 }
+
+model Notification {
+  id        String @id @default(uuid())
+  userId    String
+  message   String
+  isRead    Boolean @default(false)
+  createdAt DateTime @default(now())
+}
