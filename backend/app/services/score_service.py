@@ -45,7 +45,13 @@ async def submit_score(user_id: str, game_id: str, value: int) -> Score:
             detail="Score rejected by automated fraud prevention systems"
         )
     
-    return await score_repository.create_score(data)
+    saved_score = await score_repository.create_score(data)
+    
+    from app.services.audit_service import log_action
+    import asyncio
+    asyncio.create_task(log_action(user_id, "SCORE_SUBMIT", "Score"))
+    
+    return saved_score
 
 async def get_game_scores(game_id: str, limit: int = 50) -> List[Score]:
     game = await game_repository.get_game_by_id(game_id)

@@ -146,3 +146,11 @@ model Notification {
   isRead    Boolean @default(false)
   createdAt DateTime @default(now())
 }
+
+model AuditLog {
+  id        String @id @default(uuid())
+  userId    String
+  action    String
+  entity    String
+  createdAt DateTime @default(now())
+}

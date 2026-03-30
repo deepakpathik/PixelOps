@@ -23,10 +23,16 @@ async def join_tournament(tournament_id: str, user_id: str) -> TournamentPartici
     if tournament.entryFee > 0:
         await wallet_service.debit_user(user_id, tournament.entryFee, "TOURNAMENT_ENTRY")
         
-    return await tournament_repository.add_participant({
+    participant = await tournament_repository.add_participant({
         "tournamentId": tournament_id,
         "userId": user_id
     })
+    
+    from app.services.audit_service import log_action
+    import asyncio
+    asyncio.create_task(log_action(user_id, "TOURNAMENT_JOIN", "TournamentParticipant"))
+    
+    return participant
 
 async def generate_bracket(tournament_id: str) -> List[Match]:
     participants = await tournament_repository.get_participants(tournament_id)
