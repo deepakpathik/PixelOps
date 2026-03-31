@@ -40,6 +40,10 @@ async def login_user(email: str, password: str):
         
     access_token = security.create_access_token(subject=user.id)
     
+    from app.services.audit_service import log_action
+    import asyncio
+    asyncio.create_task(log_action(user.id, "LOGIN", "User"))
+    
     return {
         "access_token": access_token,
         "token_type": "bearer",
