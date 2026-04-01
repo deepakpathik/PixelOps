@@ -6,10 +6,11 @@ from app.db.prisma import db
 async def create_score(data: ScoreCreateInput) -> Score:
     return await db.score.create(data=data)
 
-async def get_scores_by_game(game_id: str, limit: int = 50) -> List[Score]:
+async def get_scores_by_game(game_id: str, skip: int = 0, limit: int = 50) -> List[Score]:
     return await db.score.find_many(
         where={"gameId": game_id},
         order={"value": "desc"},
+        skip=skip,
         take=limit,
         include={"user": True}
     )

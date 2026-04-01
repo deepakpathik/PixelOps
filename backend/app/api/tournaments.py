@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from typing import Any
 from app.schemas.tournament import TournamentCreate
 from app.services import tournament_service
@@ -13,8 +13,9 @@ async def create_new_tournament(tournament: TournamentCreate, current_user: User
     return await tournament_service.create_tournament(tournament.dict())
 
 @router.get("/")
-async def get_all_tournaments(current_user: User = Depends(get_current_user)) -> Any:
-    return await tournament_repository.get_all_tournaments()
+async def get_all_tournaments(current_user: User = Depends(get_current_user), page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)) -> Any:
+    skip = (page - 1) * limit
+    return await tournament_repository.get_all_tournaments(skip, limit)
 
 @router.post("/{id}/join")
 async def register_for_tournament(id: str, current_user: User = Depends(get_current_user)) -> Any:

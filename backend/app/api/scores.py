@@ -15,6 +15,9 @@ async def submit_new_score(score: ScoreSubmit, current_user: User = Depends(get_
         value=score.value
     )
 
+from fastapi import Query
+
 @router.get("/{game_id}")
-async def get_scores(game_id: str, limit: int = 50) -> Any:
-    return await score_service.get_game_scores(game_id=game_id, limit=limit)
+async def get_scores(game_id: str, page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)) -> Any:
+    skip = (page - 1) * limit
+    return await score_service.get_game_scores(game_id=game_id, skip=skip, limit=limit)

@@ -43,6 +43,6 @@ async def debit_user(user_id: str, amount: float, tx_type: str = "DEBIT") -> Tra
         "amount": amount
     })
 
-async def get_user_transactions(user_id: str) -> List[Transaction]:
+async def get_user_transactions(user_id: str, skip: int = 0, limit: int = 10) -> List[Transaction]:
     wallet = await _get_or_create_wallet(user_id)
-    return await wallet_repository.get_transactions(wallet.id)
+    return await wallet_repository.get_transactions(wallet.id, skip, limit)

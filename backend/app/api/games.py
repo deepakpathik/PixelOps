@@ -15,9 +15,12 @@ async def create_new_game(game: GameCreate, current_user: User = Depends(require
         developer_id=current_user.id
     )
 
+from fastapi import Query
+
 @router.get("/")
-async def list_all_games() -> Any:
-    return await game_service.list_games()
+async def list_all_games(page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)) -> Any:
+    skip = (page - 1) * limit
+    return await game_service.list_games(skip, limit)
 
 @router.get("/{id}")
 async def get_game_by_id(id: str) -> Any:

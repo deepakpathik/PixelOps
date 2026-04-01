@@ -6,8 +6,10 @@ from app.db.prisma import db
 async def create_game(data: GameCreateInput) -> Game:
     return await db.game.create(data=data)
 
-async def get_all_games() -> List[Game]:
+async def get_all_games(skip: int = 0, limit: int = 10) -> List[Game]:
     return await db.game.find_many(
+        skip=skip,
+        take=limit,
         include={"versions": True}
     )
 

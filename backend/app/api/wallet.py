@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from typing import Any
 from app.services import wallet_service
 from app.api.deps import get_current_user
@@ -11,5 +11,6 @@ async def get_wallet(current_user: User = Depends(get_current_user)) -> Any:
     return await wallet_service.get_balance(current_user.id)
 
 @router.get("/transactions")
-async def get_transactions(current_user: User = Depends(get_current_user)) -> Any:
-    return await wallet_service.get_user_transactions(current_user.id)
+async def get_transactions(current_user: User = Depends(get_current_user), page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)) -> Any:
+    skip = (page - 1) * limit
+    return await wallet_service.get_user_transactions(current_user.id, skip, limit)

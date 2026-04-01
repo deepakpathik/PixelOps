@@ -3,7 +3,7 @@ from app.repositories import score_repository, game_repository
 from prisma.models import Score
 from typing import List
 
-async def get_top_players(game_id: str, limit: int = 10) -> List[Score]:
+async def get_top_players(game_id: str, skip: int = 0, limit: int = 10) -> List[Score]:
     game = await game_repository.get_game_by_id(game_id)
     if not game:
         raise HTTPException(
@@ -11,4 +11,4 @@ async def get_top_players(game_id: str, limit: int = 10) -> List[Score]:
             detail="Game not found for leaderboard"
         )
         
-    return await score_repository.get_scores_by_game(game_id, limit)
+    return await score_repository.get_scores_by_game(game_id, skip, limit)

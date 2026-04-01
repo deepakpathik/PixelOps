@@ -53,7 +53,7 @@ async def submit_score(user_id: str, game_id: str, value: int) -> Score:
     
     return saved_score
 
-async def get_game_scores(game_id: str, limit: int = 50) -> List[Score]:
+async def get_game_scores(game_id: str, skip: int = 0, limit: int = 10) -> List[Score]:
     game = await game_repository.get_game_by_id(game_id)
     if not game:
         raise HTTPException(
@@ -61,4 +61,4 @@ async def get_game_scores(game_id: str, limit: int = 50) -> List[Score]:
             detail="Game not found"
         )
         
-    return await score_repository.get_scores_by_game(game_id, limit)
+    return await score_repository.get_scores_by_game(game_id, skip, limit)

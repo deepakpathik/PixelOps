@@ -15,9 +15,10 @@ async def update_balance(wallet_id: str, new_balance: float) -> Wallet:
 async def create_transaction(data: TransactionCreateInput) -> Transaction:
     return await db.transaction.create(data=data)
 
-async def get_transactions(wallet_id: str, limit: int = 50) -> List[Transaction]:
+async def get_transactions(wallet_id: str, skip: int = 0, limit: int = 50) -> List[Transaction]:
     return await db.transaction.find_many(
         where={"walletId": wallet_id},
         order={"createdAt": "desc"},
+        skip=skip,
         take=limit
     )

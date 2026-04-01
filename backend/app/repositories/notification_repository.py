@@ -10,9 +10,10 @@ async def create_notification(user_id: str, message: str) -> Notification:
         }
     )
 
-async def get_notifications(user_id: str, limit: int = 20) -> List[Notification]:
+async def get_notifications(user_id: str, skip: int = 0, limit: int = 20) -> List[Notification]:
     return await db.notification.find_many(
         where={"userId": user_id},
         order={"createdAt": "desc"},
+        skip=skip,
         take=limit
     )
