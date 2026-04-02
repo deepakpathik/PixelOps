@@ -5,7 +5,9 @@ from app.services import leaderboard_service
 
 router = APIRouter(prefix="/leaderboard", tags=["leaderboard"])
 
-@router.get("/{game_id}", response_model=List[LeaderboardEntry])
+from app.utils.response import success_response
+
+@router.get("/{game_id}")
 async def get_leaderboard(game_id: str, page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)):
     skip = (page - 1) * limit
     scores = await leaderboard_service.get_top_players(game_id, skip, limit)
@@ -18,6 +20,6 @@ async def get_leaderboard(game_id: str, page: int = Query(1, ge=1), limit: int =
                 rank=index + 1,
                 username=username,
                 score=score.value
-            )
+            ).dict()
         )
-    return leaderboard
+    return success_response(leaderboard, "Leaderboard retrieved successfully")

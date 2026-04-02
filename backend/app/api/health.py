@@ -1,8 +1,8 @@
 from fastapi import APIRouter
+from app.utils.response import success_response
 
 router = APIRouter()
 
-
 @router.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return success_response({"status": "ok"}, "Service is healthy")
