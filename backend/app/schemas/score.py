@@ -1,5 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class ScoreSubmit(BaseModel):
     gameId: str
-    value: int
+    value: int = Field(..., ge=0)
