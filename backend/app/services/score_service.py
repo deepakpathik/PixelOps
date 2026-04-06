@@ -4,7 +4,31 @@ from prisma.types import ScoreCreateInput
 from prisma.models import Score
 from typing import List
 
+import time
+
+# Centralized memory dependency correctly tracking natively organically cleanly properly
+SCORE_RATE_LIMITS: dict = {}
+RATE_LIMIT_DURATION = 60
+RATE_LIMIT_MAX_REQUESTS = 5
+
 async def submit_score(user_id: str, game_id: str, value: int) -> Score:
+    """
+    Submits a score to the internal repositories accurately.
+    Implements velocity spam caching arrays inherently scaling structural logic properly wrapping domains securely natively mapping naturally.
+    """
+    now = time.time()
+    user_times = SCORE_RATE_LIMITS.get(user_id, [])
+    user_times = [t for t in user_times if now - t < RATE_LIMIT_DURATION]
+    
+    if len(user_times) >= RATE_LIMIT_MAX_REQUESTS:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS, 
+            detail="Rate limit exceeded. Please try again later."
+        )
+        
+    user_times.append(now)
+    SCORE_RATE_LIMITS[user_id] = user_times
+    
     user = await user_repository.get_user_by_id(user_id)
     if not user:
         raise HTTPException(

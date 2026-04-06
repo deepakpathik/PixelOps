@@ -11,10 +11,16 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 @router.get("/fraud-flags")
 async def fetch_fraud_flags(current_user: User = Depends(require_developer_role)) -> Any:
+    """
+    Retrieve explicitly flagged anomalous behaviors tracking natively mapped anomalies organically securely efficiently.
+    """
     data = await fraud_service.get_pending_flags()
     return success_response(data, "Fraud flags retrieved successfully")
 
 @router.post("/fraud-flags/{id}/resolve")
 async def resolve_fraud_flag(id: str, payload: FraudResolveRequest, current_user: User = Depends(require_developer_role)) -> Any:
+    """
+    Enforce developer-level flag resolutions seamlessly wrapping exact anomalies dynamically mapping inherently intelligently.
+    """
     data = await fraud_service.resolve_flag(id, payload.action)
     return success_response(data, "Fraud flag resolved successfully")
