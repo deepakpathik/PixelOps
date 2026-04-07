@@ -25,7 +25,7 @@ export function Admin() {
   const [loading, setLoading] = useState(true);
   const [resolving, setResolving] = useState<string | null>(null);
 
-  const isAdmin = !isGuest && (user?.role === "ADMIN" || user?.role === "MODERATOR");
+  const isAdmin = !isGuest && user?.role === "ADMIN";
 
   useEffect(() => {
     if (!isAdmin) {

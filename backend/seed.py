@@ -178,15 +178,15 @@ async def main():
     now = datetime.utcnow()
     tournament_data = [
         {
-            "name": "Neon Dash World Cup",
+            "name": "Neon Dash World Cup — Season 1",
             "gameIdx": 0,
             "status": "ONGOING",
             "entryFee": 100.0,
-            "startDate": now - timedelta(days=1),
-            "endDate": now + timedelta(days=6),
+            "startDate": now - timedelta(days=2),
+            "endDate": now + timedelta(days=5),
         },
         {
-            "name": "Pixel Warriors Open",
+            "name": "Pixel Warriors Open Championship",
             "gameIdx": 1,
             "status": "OPEN",
             "entryFee": 50.0,
@@ -194,7 +194,7 @@ async def main():
             "endDate": now + timedelta(days=9),
         },
         {
-            "name": "Space Invaders Blitz",
+            "name": "Space Invaders Blitz Cup",
             "gameIdx": 2,
             "status": "OPEN",
             "entryFee": 75.0,
@@ -202,7 +202,7 @@ async def main():
             "endDate": now + timedelta(days=10),
         },
         {
-            "name": "Grid Breaker Championship",
+            "name": "Grid Breaker Championship 2026",
             "gameIdx": 3,
             "status": "COMPLETED",
             "entryFee": 200.0,
@@ -216,6 +216,14 @@ async def main():
             "entryFee": 150.0,
             "startDate": now + timedelta(days=10),
             "endDate": now + timedelta(days=17),
+        },
+        {
+            "name": "Drift Zone Grand Prix",
+            "gameIdx": 4,
+            "status": "OPEN",
+            "entryFee": 120.0,
+            "startDate": now + timedelta(days=1),
+            "endDate": now + timedelta(days=8),
         },
     ]
 
@@ -234,25 +242,36 @@ async def main():
             tournaments.append(t)
             print(f"✅ Tournament: {td['name']} ({td['status']})")
 
-            # Add 3 participants to open/ongoing tournaments
-            if td["status"] in ("OPEN", "ONGOING"):
-                for player in players[:3]:
+            # Add participants to open/ongoing tournaments
+            participants = players if td["status"] in ("OPEN", "ONGOING") else players[:2]
+            for player in participants:
+                try:
                     await db.tournamentparticipant.create(data={
                         "tournamentId": t.id,
                         "userId": player.id,
                     })
+                except Exception:
+                    pass  # skip duplicate
         else:
             tournaments.append(existing)
             print(f"♻️  Tournament exists: {td['name']}")
+
 
     # ── Matches for ONGOING tournament ────────────────────────────────────────
     if tournaments and players and len(players) >= 4:
         ongoing = next((t for t in tournaments if t.status == "ONGOING"), None)
         if ongoing:
             match_data = [
-                (players[0].id, players[1].id, players[0].id, 1),
+                # Quarter-Finals (Round 1)
+                (players[0].id, players[5].id, players[0].id, 1),
+                (players[1].id, players[4].id, players[1].id, 1),
                 (players[2].id, players[3].id, players[2].id, 1),
-                (players[0].id, players[2].id, None, 2),
+                (players[3].id, players[5].id, players[3].id, 1),
+                # Semi-Finals (Round 2)
+                (players[0].id, players[2].id, players[0].id, 2),
+                (players[1].id, players[3].id, players[1].id, 2),
+                # Finals (Round 3) — still in progress
+                (players[0].id, players[1].id, None, 3),
             ]
             for p1, p2, winner, rnd in match_data:
                 existing = await db.match.find_first(
@@ -266,18 +285,32 @@ async def main():
                         "player2Id": p2,
                         "winnerId": winner,
                     })
-            print("✅ Bracket matches seeded for ongoing tournament")
+            print("✅ Bracket matches seeded (QF + SF + Finals) for ongoing tournament")
 
     # ── Notifications ─────────────────────────────────────────────────────────
     notif_data = [
+        # NeonByte (players[0])
         (players[0].id, "🏆 You climbed to Rank #1 on Neon Dash!"),
         (players[0].id, "⚡ Score submission accepted — 98,500 pts recorded"),
-        (players[0].id, "🎯 Tournament 'Neon Dash World Cup' has started!"),
+        (players[0].id, "🎯 Tournament 'Neon Dash World Cup — Season 1' is now LIVE!"),
         (players[0].id, "💰 Reward of 500 coins credited to your wallet"),
-        (players[1].id, "🏆 You entered the Top 3 on Pixel Warriors!"),
-        (players[1].id, "🎮 New tournament 'Pixel Warriors Open' is now accepting entries"),
-        (admin.id,      "🚨 2 new fraud flags require your review"),
-        (admin.id,      "✅ System check complete — all services nominal"),
+        (players[0].id, "🥊 You advanced to the Semi-Finals! Next match loading..."),
+        # GridHunter (players[1])
+        (players[1].id, "🏆 You reached Rank #2 on Pixel Warriors!"),
+        (players[1].id, "🎮 'Pixel Warriors Open Championship' is now open — join now!"),
+        (players[1].id, "💰 Entry fee of 50 coins deducted for Pixel Warriors Open"),
+        (players[1].id, "⚡ Score of 52,000 submitted on Pixel Warriors"),
+        # VoxelKing (players[2])
+        (players[2].id, "🎯 New tournament 'Space Invaders Blitz Cup' — you're registered!"),
+        (players[2].id, "💰 Wallet credited 250 coins from game reward"),
+        # CyberPulse (players[3])
+        (players[3].id, "🎮 'Drift Zone Grand Prix' starts tomorrow — are you ready?"),
+        (players[3].id, "🏆 Score of 61,000 is your personal best on Pixel Warriors!"),
+        # Admin
+        (admin.id, "🚨 2 new fraud flags require your review"),
+        (admin.id, "✅ System check complete — all services nominal"),
+        (admin.id, "📊 6 players registered across 4 active tournaments"),
+        (admin.id, "🎯 'Neon Dash World Cup — Season 1' quarter-finals completed"),
     ]
     for user_id, message in notif_data:
         await db.notification.create(data={
@@ -287,6 +320,7 @@ async def main():
         })
 
     print("✅ Notifications seeded")
+
 
     await db.disconnect()
 

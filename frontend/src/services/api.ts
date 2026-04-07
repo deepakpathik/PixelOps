@@ -115,6 +115,14 @@ export function getNotifications(page = 1, limit = 20) {
   return request<ApiNotification[]>('GET', `/notifications?page=${page}&limit=${limit}`);
 }
 
+export function markNotificationRead(id: string) {
+  return request<ApiNotification>('PATCH', `/notifications/${id}/read`);
+}
+
+export function markAllNotificationsRead() {
+  return request<{ updated: number }>('PATCH', '/notifications/read-all');
+}
+
 // ─── Admin ───────────────────────────────────────────────────────────────────
 
 export function getFraudFlags() {

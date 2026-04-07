@@ -7,3 +7,9 @@ async def send_notification(user_id: str, message: str) -> Notification:
 
 async def get_user_notifications(user_id: str, skip: int = 0, limit: int = 10) -> List[Notification]:
     return await notification_repository.get_notifications(user_id, skip, limit)
+
+async def mark_read(notification_id: str, user_id: str) -> Notification:
+    return await notification_repository.mark_read(notification_id, user_id)
+
+async def mark_all_read(user_id: str) -> int:
+    return await notification_repository.mark_all_read(user_id)

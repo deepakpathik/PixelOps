@@ -3,25 +3,49 @@ import { Outlet, NavLink } from "react-router";
 import { Home, Trophy, Swords, Wallet, Settings, Search, User, Bell, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { AuthModal } from "./AuthModal";
-import { getNotifications } from "../services/api";
+import { NotificationPanel } from "./NotificationPanel";
+import { getNotifications, ApiNotification } from "../services/api";
 
 export function Layout() {
   const { user, isGuest, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState<ApiNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Poll notifications every 30s when logged in
+  // Fetch + poll notifications every 30s when logged in
   useEffect(() => {
-    if (isGuest) return;
+    if (isGuest) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
     const fetchNotifs = () => {
       getNotifications(1, 50)
-        .then((notifs) => setUnreadCount(notifs.filter((n) => !n.isRead).length))
+        .then((notifs) => {
+          setNotifications(notifs);
+          setUnreadCount(notifs.filter((n) => !n.isRead).length);
+        })
         .catch(() => {});
     };
     fetchNotifs();
     const interval = setInterval(fetchNotifs, 30_000);
     return () => clearInterval(interval);
   }, [isGuest]);
+
+  // Mark single as read locally
+  const handleMarkRead = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+    setUnreadCount((c) => Math.max(0, c - 1));
+  };
+
+  // Mark all as read locally
+  const handleMarkAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setUnreadCount(0);
+  };
 
   const navItems = [
     { path: "/", icon: Home, label: "Dashboard" },
@@ -33,9 +57,9 @@ export function Layout() {
 
   return (
     <div className="h-screen bg-black text-white flex">
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
       <aside className="w-60 bg-zinc-950 border-r border-zinc-800 flex flex-col">
         <div className="h-16 px-6 flex items-center border-b border-zinc-800">
@@ -62,7 +86,7 @@ export function Layout() {
           ))}
         </nav>
 
-        <div 
+        <div
           className={`p-4 border-t border-zinc-800 transition-all duration-200 ${
             isGuest ? "cursor-pointer hover:bg-zinc-900 hover:border-zinc-700" : ""
           }`}
@@ -81,7 +105,7 @@ export function Layout() {
               </div>
             </div>
             {!isGuest && (
-              <button 
+              <button
                 onClick={(e) => { e.stopPropagation(); logout(); }}
                 className="p-1.5 text-zinc-500 hover:text-white rounded-md transition-all duration-200 hover:bg-zinc-800 pixelops-btn"
                 title="Logout"
@@ -105,24 +129,44 @@ export function Layout() {
               />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
+            {/* Notification Bell */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  if (isGuest) { setIsAuthModalOpen(true); return; }
+                  setIsNotifOpen((o) => !o);
+                }}
+                className={`w-10 h-10 rounded-md flex items-center justify-center transition-all duration-200 relative pixelops-btn ${
+                  isNotifOpen ? "bg-zinc-800 text-white" : "hover:bg-zinc-900 text-zinc-400 hover:text-white"
+                }`}
+                title="Notifications"
+              >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-[#107C10] rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1 animate-pulse">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
 
-          <button className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-zinc-900 transition-all duration-200 relative pixelops-btn">
-            <Bell size={20} className="text-zinc-400" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-[#107C10] rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            )}
-          </button>
+              <NotificationPanel
+                notifications={notifications}
+                unreadCount={unreadCount}
+                isOpen={isNotifOpen}
+                onClose={() => setIsNotifOpen(false)}
+                onMarkRead={handleMarkRead}
+                onMarkAllRead={handleMarkAllRead}
+              />
+            </div>
 
-          <button 
-            className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:ring-2 ring-[#107C10] transition-all duration-200 pixelops-btn"
-            onClick={() => isGuest && setIsAuthModalOpen(true)}
-          >
-            <User size={18} className={isGuest ? "text-zinc-400" : "text-[#107C10]"} />
-          </button>
+            <button
+              className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center hover:ring-2 ring-[#107C10] transition-all duration-200 pixelops-btn"
+              onClick={() => isGuest && setIsAuthModalOpen(true)}
+            >
+              <User size={18} className={isGuest ? "text-zinc-400" : "text-[#107C10]"} />
+            </button>
           </div>
         </header>
 
