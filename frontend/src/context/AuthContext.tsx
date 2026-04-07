@@ -5,7 +5,7 @@ interface User {
   id: string;
   username: string;
   email: string;
-  role: "PLAYER" | "DEVELOPER" | "MODERATOR" | "ADMIN";
+  role: 'PLAYER' | 'ADMIN';
 }
 
 interface AuthContextType {
@@ -64,18 +64,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       id: apiUser.id,
       username: apiUser.username,
       email: apiUser.email,
-      role: apiUser.role,
+      role: (apiUser.role === 'ADMIN' ? 'ADMIN' : 'PLAYER') as User['role'],
     });
   };
 
   const login = async (email: string, password: string) => {
     const res = await loginUser(email, password);
-    storeSession(res.token, res.user);
+    storeSession(res.access_token, res.user);
   };
 
   const signup = async (username: string, email: string, password: string) => {
     const res = await registerUser(username, email, password);
-    storeSession(res.token, res.user);
+    storeSession(res.access_token, res.user);
   };
 
   const logout = () => {

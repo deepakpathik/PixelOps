@@ -32,13 +32,17 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   }
 
   // Unwrap standardized envelope { success, data, message }
-  return json.data ?? json;
+  // Backend wraps with success_response, so data holds the real payload
+  if (json.success !== undefined) {
+    return json.data;
+  }
+  return json;
 }
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
 export function registerUser(username: string, email: string, password: string) {
-  return request<{ token: string; user: ApiUser }>('POST', '/auth/register', {
+  return request<{ access_token: string; user: ApiUser }>('POST', '/auth/register', {
     username,
     email,
     password,
@@ -46,7 +50,7 @@ export function registerUser(username: string, email: string, password: string) 
 }
 
 export function loginUser(email: string, password: string) {
-  return request<{ token: string; user: ApiUser }>('POST', '/auth/login', {
+  return request<{ access_token: string; user: ApiUser }>('POST', '/auth/login', {
     email,
     password,
   });
@@ -127,7 +131,7 @@ export interface ApiUser {
   id: string;
   username: string;
   email: string;
-  role: 'PLAYER' | 'DEVELOPER' | 'MODERATOR' | 'ADMIN';
+  role: 'PLAYER' | 'ADMIN';
 }
 
 export interface ApiGame {
