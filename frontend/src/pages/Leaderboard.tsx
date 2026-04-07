@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Minus, Trophy, ChevronDown } from "lucide-react";
+import { TrendingUp, Minus, Trophy, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getGames, getLeaderboard, ApiGame, ApiLeaderboardEntry } from "../services/api";

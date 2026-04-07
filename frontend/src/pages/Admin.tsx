@@ -1,4 +1,4 @@
-import { Users, Gamepad2, Trophy, TrendingUp, CheckCircle, XCircle, Shield } from "lucide-react";
+import { TrendingUp, CheckCircle, XCircle, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getFraudFlags, resolveFraudFlag, ApiFraudFlag } from "../services/api";
