@@ -11,11 +11,24 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      // Alias @ to the src directory
       '@': path.resolve(__dirname, './src'),
     },
   },
 
-  // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  server: {
+    proxy: {
+      '/auth': 'http://localhost:8000',
+      '/games': 'http://localhost:8000',
+      '/scores': 'http://localhost:8000',
+      '/leaderboard': 'http://localhost:8000',
+      '/tournaments': 'http://localhost:8000',
+      '/wallet': 'http://localhost:8000',
+      '/transactions': 'http://localhost:8000',
+      '/notifications': 'http://localhost:8000',
+      '/admin': 'http://localhost:8000',
+      '/health': 'http://localhost:8000',
+    },
+  },
 })

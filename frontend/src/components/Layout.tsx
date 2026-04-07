@@ -1,12 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, NavLink } from "react-router";
 import { Home, Trophy, Swords, Wallet, Settings, Search, User, Bell, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { AuthModal } from "./AuthModal";
+import { getNotifications } from "../services/api";
 
 export function Layout() {
   const { user, isGuest, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Poll notifications every 30s when logged in
+  useEffect(() => {
+    if (isGuest) return;
+    const fetchNotifs = () => {
+      getNotifications(1, 50)
+        .then((notifs) => setUnreadCount(notifs.filter((n) => !n.isRead).length))
+        .catch(() => {});
+    };
+    fetchNotifs();
+    const interval = setInterval(fetchNotifs, 30_000);
+    return () => clearInterval(interval);
+  }, [isGuest]);
 
   const navItems = [
     { path: "/", icon: Home, label: "Dashboard" },
@@ -62,7 +77,7 @@ export function Layout() {
                 {isGuest ? "Guest Player" : user?.username}
               </div>
               <div className="text-xs text-zinc-500">
-                {isGuest ? "Click to Login • Level -" : `Level ${user?.level}`}
+                {isGuest ? "Click to Login" : user?.role?.toLowerCase()}
               </div>
             </div>
             {!isGuest && (
@@ -95,7 +110,11 @@ export function Layout() {
 
           <button className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-zinc-900 transition-all duration-200 relative pixelops-btn">
             <Bell size={20} className="text-zinc-400" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-[#107C10] rounded-full"></span>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-[#107C10] rounded-full text-[10px] font-bold text-white flex items-center justify-center px-1">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
           <button 
