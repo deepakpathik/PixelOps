@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { TrendingUp, Clock, Trophy, Gamepad2, Zap, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { getGames, getWallet, submitScore, ApiGame } from "../services/api";
+import { getGames, getWallet, getTransactions, submitScore, ApiGame, ApiTransaction } from "../services/api";
 
 export function Dashboard() {
   const { user, isGuest } = useAuth();
   const [games, setGames] = useState<ApiGame[]>([]);
   const [balance, setBalance] = useState<number | null>(null);
+  const [recentActivity, setRecentActivity] = useState<ApiTransaction[]>([]);
   const [gamesLoading, setGamesLoading] = useState(true);
 
   // Score submit modal state
@@ -27,6 +28,10 @@ export function Dashboard() {
     if (!isGuest) {
       getWallet()
         .then((w) => setBalance(w.balance))
+        .catch(console.error);
+        
+      getTransactions(1, 5)
+        .then(setRecentActivity)
         .catch(console.error);
     }
   }, [isGuest]);
@@ -208,16 +213,44 @@ export function Dashboard() {
         )}
       </div>
 
-      {/* Recent Activity placeholder */}
+      {/* Recent Activity */}
       <div>
         <h3 className="text-lg font-bold mb-4">Recent Activity</h3>
-        <div className="pixelops-card p-12 flex flex-col items-center justify-center text-center">
-          <Clock size={48} className="text-zinc-800 mb-4" />
-          <h4 className="text-lg font-medium text-zinc-300 mb-1">No Activity Found</h4>
-          <p className="text-zinc-500 max-w-sm">
-            Play a game and submit a score to see your history here.
-          </p>
-        </div>
+        {!isGuest && recentActivity.length > 0 ? (
+          <div className="pixelops-card divide-y divide-zinc-800/60">
+            {recentActivity.map((tx) => (
+              <div key={tx.id} className="flex justify-between items-center p-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    tx.type === "REWARD" ? "bg-yellow-500/20 text-yellow-500" :
+                    tx.type === "ENTRY_FEE" ? "bg-blue-500/20 text-blue-500" :
+                    tx.type === "CREDIT" ? "bg-[#107C10]/20 text-[#107C10]" :
+                    "bg-zinc-800 text-zinc-400"
+                  }`}>
+                    {tx.type === "REWARD" ? "🏆" : tx.type === "ENTRY_FEE" ? "⚔️" : "💰"}
+                  </div>
+                  <div>
+                    <p className="font-bold">{tx.type.replace("_", " ")}</p>
+                    <p className="text-xs text-zinc-500">{new Date(tx.createdAt).toLocaleString(undefined, {
+                      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+                    })}</p>
+                  </div>
+                </div>
+                <div className={`font-bold font-mono ${tx.amount > 0 ? "text-[#107C10]" : "text-white"}`}>
+                  {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="pixelops-card p-12 flex flex-col items-center justify-center text-center">
+            <Clock size={48} className="text-zinc-800 mb-4" />
+            <h4 className="text-lg font-medium text-zinc-300 mb-1">No Activity Found</h4>
+            <p className="text-zinc-500 max-w-sm">
+              Play a game and submit a score to see your history here.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -58,18 +58,26 @@ export function loginUser(email: string, password: string) {
 
 // ─── Games ───────────────────────────────────────────────────────────────────
 
-export function getGames(page = 1, limit = 9) {
-  return request<ApiGame[]>('GET', `/games?page=${page}&limit=${limit}`);
+export function getGames(page = 1, limit = 9, includeInactive = false) {
+  return request<ApiGame[]>('GET', `/games/?page=${page}&limit=${limit}&include_inactive=${includeInactive}`);
 }
 
 export function getGame(id: string) {
   return request<ApiGame>('GET', `/games/${id}`);
 }
 
+export function createGame(title: string, description: string, format: string) {
+  return request<ApiGame>('POST', '/games/', { title, description, format });
+}
+
+export function deleteGame(id: string) {
+  return request<unknown>('DELETE', `/games/${id}`);
+}
+
 // ─── Scores ──────────────────────────────────────────────────────────────────
 
 export function submitScore(gameId: string, value: number) {
-  return request<ApiScore>('POST', '/scores', { gameId, value });
+  return request<ApiScore>('POST', '/scores/', { gameId, value });
 }
 
 export function getScores(gameId: string, page = 1, limit = 10) {
@@ -88,7 +96,7 @@ export function getLeaderboard(gameId: string, page = 1, limit = 10) {
 // ─── Tournaments ─────────────────────────────────────────────────────────────
 
 export function getTournaments(page = 1, limit = 10) {
-  return request<ApiTournament[]>('GET', `/tournaments?page=${page}&limit=${limit}`);
+  return request<ApiTournament[]>('GET', `/tournaments/?page=${page}&limit=${limit}`);
 }
 
 export function joinTournament(id: string) {
@@ -112,7 +120,7 @@ export function getTransactions(page = 1, limit = 20) {
 // ─── Notifications ───────────────────────────────────────────────────────────
 
 export function getNotifications(page = 1, limit = 20) {
-  return request<ApiNotification[]>('GET', `/notifications?page=${page}&limit=${limit}`);
+  return request<ApiNotification[]>('GET', `/notifications/?page=${page}&limit=${limit}`);
 }
 
 export function markNotificationRead(id: string) {

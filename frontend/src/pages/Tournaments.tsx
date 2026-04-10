@@ -112,7 +112,16 @@ export function Tournaments() {
             List View
           </button>
           <button
-            onClick={() => setView("bracket")}
+            onClick={() => {
+              if (view !== "bracket") {
+                if (!selectedTournament && tournaments.length > 0) {
+                  const active = tournaments.find((t) => t.status === "ONGOING" || t.status === "COMPLETED") || tournaments[0];
+                  openBracket(active);
+                } else {
+                  setView("bracket");
+                }
+              }
+            }}
             className={`px-6 py-2 rounded-md font-bold transition-all duration-200 ${
               view === "bracket"
                 ? "bg-[#107C10] text-white shadow-md shadow-[#107C10]/20"

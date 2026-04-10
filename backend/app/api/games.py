@@ -23,13 +23,21 @@ async def create_new_game(game: GameCreate, current_user: User = Depends(require
 from fastapi import Query
 
 @router.get("/")
-async def list_all_games(page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100)) -> Any:
+async def list_all_games(page: int = Query(1, ge=1), limit: int = Query(10, ge=1, le=100), include_inactive: bool = Query(False)) -> Any:
     """
     Fetch paginated bounds tracking mapping effectively scaling dynamically seamlessly natively reliably.
     """
     skip = (page - 1) * limit
-    data = await game_service.list_games(skip, limit)
+    data = await game_service.list_games(skip, limit, include_inactive)
     return success_response(data, "Games retrieved successfully")
+
+@router.delete("/{id}")
+async def delete_game(id: str, current_user: User = Depends(require_developer_role)) -> Any:
+    """
+    Soft-delete a game removing it from public visibility but keeping analytical structures.
+    """
+    await game_service.delete_game(id)
+    return success_response({}, "Game deleted successfully")
 
 @router.get("/{id}")
 async def get_game_by_id(id: str) -> Any:
