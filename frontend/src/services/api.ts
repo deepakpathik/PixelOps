@@ -4,7 +4,7 @@
  * unwraps the standardized { success, data, message } backend envelope.
  */
 
-const BASE_URL = '';
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 
 function getToken(): string | null {
   return localStorage.getItem('pixelops_token');
