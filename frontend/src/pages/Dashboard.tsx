@@ -3,6 +3,8 @@ import { TrendingUp, Clock, Trophy, Gamepad2, Zap, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { getGames, getWallet, getTransactions, submitScore, ApiGame, ApiTransaction } from "../services/api";
 
+import { PlayableGameModal } from "../components/PlayableGameModal";
+
 export function Dashboard() {
   const { user, isGuest } = useAuth();
   const [games, setGames] = useState<ApiGame[]>([]);
@@ -12,10 +14,7 @@ export function Dashboard() {
 
   // Score submit modal state
   const [scoreModal, setScoreModal] = useState<{ game: ApiGame } | null>(null);
-  const [scoreValue, setScoreValue] = useState("");
-  const [scoreError, setScoreError] = useState<string | null>(null);
   const [scoreSubmitting, setScoreSubmitting] = useState(false);
-  const [scoreSuccess, setScoreSuccess] = useState(false);
 
   useEffect(() => {
     getGames(1, 9)
@@ -30,7 +29,7 @@ export function Dashboard() {
         .then((w) => setBalance(w.balance))
         .catch(console.error);
         
-      getTransactions(1, 5)
+      getTransactions(1, 4)
         .then(setRecentActivity)
         .catch(console.error);
     }
@@ -39,22 +38,25 @@ export function Dashboard() {
   const openScoreModal = (game: ApiGame) => {
     if (isGuest) return;
     setScoreModal({ game });
-    setScoreValue("");
-    setScoreError(null);
-    setScoreSuccess(false);
   };
 
-  const handleScoreSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleScoreSubmit = async (finalScore: number) => {
     if (!scoreModal) return;
-    setScoreError(null);
     setScoreSubmitting(true);
     try {
-      await submitScore(scoreModal.game.id, parseInt(scoreValue, 10));
-      setScoreSuccess(true);
-      setTimeout(() => setScoreModal(null), 1500);
+      await submitScore(scoreModal.game.id, finalScore);
+      setScoreModal(null);
+      // Optional: reload wallet, transactions & leaderboard smoothly natively
+      const w = await getWallet();
+      setBalance(w.balance);
+      const [acts, topScoresRefresh] = await Promise.all([
+        getTransactions(1, 4),
+        getTopScores()
+      ]);
+      setRecentActivity(acts);
+      setTopScores(topScoresRefresh);
     } catch (err: unknown) {
-      setScoreError(err instanceof Error ? err.message : "Score submission failed");
+      alert("Score submission failed: " + (err instanceof Error ? err.message : String(err)));
     } finally {
       setScoreSubmitting(false);
     }
@@ -69,56 +71,25 @@ export function Dashboard() {
     IFRAME: "🖼️",
   };
 
+  const imgMap: Record<string, string> = {
+    "Drift Zone": "drift.png",
+    "Grid Breaker": "grid_breaker.png",
+    "Neon Dash": "neon.png",
+    "Pixel Warriors": "pixel.png",
+    "Shadow Realm": "shadow_realm.png",
+    "Space Invaders X": "space.png"
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Score Submit Modal */}
       {scoreModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-sm shadow-2xl relative p-6">
-            <button
-              onClick={() => setScoreModal(null)}
-              className="absolute top-4 right-4 text-zinc-500 hover:text-white"
-            >
-              <X size={18} />
-            </button>
-            <h3 className="text-xl font-bold mb-1">Submit Score</h3>
-            <p className="text-sm text-zinc-500 mb-5">{scoreModal.game.title}</p>
-
-            {scoreSuccess ? (
-              <div className="py-6 text-center">
-                <Trophy size={40} className="text-[#107C10] mx-auto mb-3" />
-                <p className="font-bold text-white">Score submitted!</p>
-              </div>
-            ) : (
-              <form onSubmit={handleScoreSubmit} className="space-y-4">
-                {scoreError && (
-                  <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-sm">
-                    {scoreError}
-                  </p>
-                )}
-                <div>
-                  <label className="text-sm text-zinc-400 mb-1 block">Your Score</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={scoreValue}
-                    onChange={(e) => setScoreValue(e.target.value)}
-                    placeholder="Enter score"
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded-sm px-4 py-3 text-2xl font-bold font-mono focus:outline-none focus:border-[#107C10] transition-colors"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={scoreSubmitting}
-                  className="w-full bg-[#107C10] hover:bg-[#0d6b0d] disabled:opacity-50 text-white font-bold py-3 rounded-sm transition-colors"
-                >
-                  {scoreSubmitting ? "Submitting..." : "Submit Score"}
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
+        <PlayableGameModal
+          game={scoreModal.game}
+          onClose={() => setScoreModal(null)}
+          onSubmitScore={handleScoreSubmit}
+          isSubmitting={scoreSubmitting}
+        />
       )}
 
       {/* Hero / Profile Card */}
@@ -190,8 +161,16 @@ export function Dashboard() {
                 className="pixelops-card overflow-hidden cursor-pointer group"
                 onClick={() => openScoreModal(game)}
               >
-                <div className="aspect-video bg-zinc-900 flex items-center justify-center text-6xl group-hover:brightness-110 transition-all">
-                  {gameFormatIcon[game.format] ?? "🕹️"}
+                <div className="aspect-video bg-zinc-900 flex items-center justify-center text-6xl group-hover:brightness-110 transition-all overflow-hidden relative">
+                  {imgMap[game.title] ? (
+                    <img
+                      src={`/images/games/${imgMap[game.title]}`}
+                      alt={game.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    gameFormatIcon[game.format] ?? "🕹️"
+                  )}
                 </div>
                 <div className="p-5">
                   <h4 className="font-bold mb-1 group-hover:text-[#107C10] transition-colors">

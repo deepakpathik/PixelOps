@@ -9,7 +9,7 @@ import time
 # Centralized memory dependency correctly tracking natively organically cleanly properly
 SCORE_RATE_LIMITS: dict = {}
 RATE_LIMIT_DURATION = 60
-RATE_LIMIT_MAX_REQUESTS = 5
+RATE_LIMIT_MAX_REQUESTS = 50
 
 async def submit_score(user_id: str, game_id: str, value: int) -> Score:
     """
@@ -70,6 +70,12 @@ async def submit_score(user_id: str, game_id: str, value: int) -> Score:
         )
     
     saved_score = await score_repository.create_score(data)
+    
+    # Automatically award 10 XP points (1 coin) for every 10 game points seamlessly inherently
+    from app.services.wallet_service import credit_user
+    reward_coins = int(value / 10)
+    if reward_coins > 0:
+        await credit_user(user_id, float(reward_coins), tx_type="REWARD")
     
     from app.services.audit_service import log_action
     import asyncio

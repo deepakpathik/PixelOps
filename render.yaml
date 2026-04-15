@@ -1,0 +1,37 @@
+services:
+  # Backend API Service
+  - type: web
+    name: pixelops-backend
+    env: python
+    region: ohio
+    buildCommand: "cd backend && pip install -r requirements.txt && prisma generate"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "https://pixelops-frontend.onrender.com"
+        
+  # Frontend Static Site
+  - type: web # Alternative to static if treating as SSR or just raw node. But typically static is best if built
+    name: pixelops-frontend
+    env: node
+    region: ohio
+    buildCommand: "cd frontend && npm install && npm run build"
+    startCommand: "cd frontend && npm run preview -- --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: VITE_API_URL
+        value: "https://pixelops-backend.onrender.com"
+        
+# For a purely static frontend site:
+# - type: static
+#   name: pixelops-frontend
+#   region: ohio
+#   buildCommand: "cd frontend && npm install && npm run build"
+#   staticPublishPath: "./frontend/dist"
+#   envVars:
+#     - key: VITE_API_URL
+#       value: "https://pixelops-backend.onrender.com"

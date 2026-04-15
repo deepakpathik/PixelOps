@@ -19,6 +19,8 @@ async def lifespan(app: FastAPI):
     yield
     await db.disconnect()
 
+import os
+
 app = FastAPI(
     title="PixelOps API",
     description="Backend for the PixelOps arcade gaming platform",
@@ -26,9 +28,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:5174").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

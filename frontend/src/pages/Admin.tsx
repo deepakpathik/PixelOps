@@ -207,20 +207,95 @@ export function Admin() {
             </div>
           </div>
           
-          <div className="pixelops-card p-8 bg-zinc-900/40">
-            <h3 className="text-xl font-bold mb-3">System Health</h3>
-            <div className="space-y-3 font-mono text-sm text-zinc-400">
-              <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                <span>Database Connectivity</span>
-                <span className="text-[#107C10] font-bold">ONLINE</span>
+          <div className="grid grid-cols-3 gap-6">
+            <div className="col-span-2 pixelops-card flex flex-col overflow-hidden bg-black border-zinc-800">
+              <div className="p-4 border-b border-zinc-800 bg-zinc-950 flex items-center justify-between">
+                <h3 className="font-bold text-white uppercase tracking-wider text-sm flex items-center gap-2">
+                  <AlertCircle size={14} className="text-zinc-500" /> System Logs
+                </h3>
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#107C10] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#107C10]"></span>
+                </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                <span>Fraud Detection Pipeline</span>
-                <span className="text-[#107C10] font-bold">ACTIVE</span>
+              <div className="p-4 bg-black font-mono text-xs overflow-y-auto h-64 space-y-2">
+                <div className="flex gap-3 text-zinc-400">
+                  <span className="text-zinc-600">14:45:23</span>
+                  <span className="text-zinc-500 bg-zinc-900 px-1 rounded">INFO</span>
+                  <span className="text-zinc-300">Tournament 'Cyber Strike Championship' started</span>
+                </div>
+                <div className="flex gap-3 text-zinc-400">
+                  <span className="text-zinc-600">14:42:18</span>
+                  <span className="text-yellow-500 bg-yellow-500/10 px-1 rounded">WARN</span>
+                  <span className="text-yellow-400">High API latency detected — avg 450ms</span>
+                </div>
+                <div className="flex gap-3 text-zinc-400">
+                  <span className="text-zinc-600">14:38:55</span>
+                  <span className="text-zinc-500 bg-zinc-900 px-1 rounded">INFO</span>
+                  <span className="text-zinc-300">Database backup completed successfully</span>
+                </div>
+                <div className="flex gap-3 text-zinc-400">
+                  <span className="text-zinc-600">14:35:12</span>
+                  <span className="text-red-500 bg-red-500/10 px-1 rounded">FAIL</span>
+                  <span className="text-red-400">Failed payment processing for user ID 8472</span>
+                </div>
+                <div className="flex gap-3 text-zinc-400">
+                  <span className="text-zinc-600">14:20:47</span>
+                  <span className="text-zinc-500 bg-zinc-900 px-1 rounded">INFO</span>
+                  <span className="text-zinc-300">New tournament created: 'Arena Combat Pro League'</span>
+                </div>
+                <div className="flex gap-3 text-zinc-400">
+                  <span className="text-zinc-600">14:15:02</span>
+                  <span className="text-blue-400 bg-blue-500/10 px-1 rounded">AUTH</span>
+                  <span className="text-blue-300">Admin login successful from IP 192.168.1.44</span>
+                </div>
               </div>
-              <div className="flex justify-between items-center py-2">
-                <span>Storage Cluster</span>
-                <span className="text-[#107C10] font-bold">NOMINAL</span>
+            </div>
+
+            <div className="col-span-1 pixelops-card flex flex-col border-zinc-800">
+              <div className="p-4 border-b border-zinc-800 bg-zinc-950">
+                <h3 className="font-bold text-white uppercase tracking-wider text-sm">Global Activity</h3>
+              </div>
+              <div className="p-0 divide-y divide-zinc-800/60 h-64 overflow-y-auto">
+                <div className="p-4 flex items-center justify-between hover:bg-zinc-900/40 transition-colors">
+                  <div>
+                    <div className="font-bold text-white text-sm">EliteSniper_47</div>
+                    <div className="text-xs text-zinc-500">Won tournament</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-zinc-600 mb-0.5">2m ago</div>
+                    <div className="text-sm font-bold font-mono text-[#107C10]">+5000</div>
+                  </div>
+                </div>
+                <div className="p-4 flex items-center justify-between hover:bg-zinc-900/40 transition-colors">
+                  <div>
+                    <div className="font-bold text-white text-sm">PixelWarrior</div>
+                    <div className="text-xs text-zinc-500">Joined tournament</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-zinc-600 mb-0.5">8m ago</div>
+                    <div className="text-sm font-bold font-mono text-white">-250</div>
+                  </div>
+                </div>
+                <div className="p-4 flex items-center justify-between hover:bg-zinc-900/40 transition-colors">
+                  <div>
+                    <div className="font-bold text-white text-sm">CyberNinja</div>
+                    <div className="text-xs text-zinc-500">Level up to 52</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-zinc-600 mb-0.5">15m ago</div>
+                  </div>
+                </div>
+                <div className="p-4 flex items-center justify-between hover:bg-zinc-900/40 transition-colors">
+                  <div>
+                    <div className="font-bold text-white text-sm">Player_X</div>
+                    <div className="text-xs text-zinc-500">Converted XP</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-zinc-600 mb-0.5">23m ago</div>
+                    <div className="text-sm font-bold font-mono text-[#107C10]">+1200</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
