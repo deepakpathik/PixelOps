@@ -46,15 +46,17 @@ export function Dashboard() {
     try {
       await submitScore(scoreModal.game.id, finalScore);
       setScoreModal(null);
-      // Optional: reload wallet, transactions & leaderboard smoothly natively
-      const w = await getWallet();
-      setBalance(w.balance);
-      const [acts, topScoresRefresh] = await Promise.all([
-        getTransactions(1, 4),
-        getTopScores()
-      ]);
-      setRecentActivity(acts);
-      setTopScores(topScoresRefresh);
+      // Small delay to let backend commit the REWARD transaction
+      await new Promise((r) => setTimeout(r, 600));
+      // Refresh wallet balance and recent activity
+      try {
+        const w = await getWallet();
+        setBalance(w.balance);
+        const acts = await getTransactions(1, 4);
+        setRecentActivity(acts);
+      } catch (refreshErr) {
+        console.error("Post-submit refresh failed:", refreshErr);
+      }
     } catch (err: unknown) {
       alert("Score submission failed: " + (err instanceof Error ? err.message : String(err)));
     } finally {
