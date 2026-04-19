@@ -267,7 +267,7 @@ erDiagram
 
     Wallet {
         uuid id PK
-        string userId FK_UK
+        string userId FK
         float balance
     }
 
